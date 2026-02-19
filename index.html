@@ -1453,59 +1453,81 @@ function positionCommentBubble(bubble, textElement, timelineItem) {
         }
 
                 // 从 JSONBin 加载评论
-        async function loadComments() {
-            try {
-                console.log('正在从云端加载评论...');
-                const response = await fetch(JSONBIN_API_URL, {
-                    headers: {
-                        'X-Master-Key': JSONBIN_MASTER_KEY
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP错误: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                console.log('从云端收到的数据:', data);
-                
-                // 处理数据格式
-                let comments = [];
-                if (Array.isArray(data.record)) {
-                    comments = data.record;
-                } else if (data.record && data.record.comments && Array.isArray(data.record.comments)) {
-                    comments = data.record.comments;
-                } else {
-                    comments = data.record || [];
-                }
-                
-                // 过滤掉系统消息并渲染
-                comments = comments.filter(comment => comment.author !== 'system');
-                comments.forEach(comment => {
-                    const textElement = document.querySelector(`[data-text-id="${comment.textId}"]`);
-                    if (textElement) {
-                        currentTimelineItem = textElement.closest('.timeline-item');
-                        displayComment(comment);
-                    }
-                });
-                
-                // 本地备份
-                localStorage.setItem('timelineComments_backup', JSON.stringify(comments));
-                console.log(`成功加载 ${comments.length} 条评论`);
-                
-            } catch (error) {
-                console.error('从云端加载评论失败:', error);
-                // 降级到本地存储
-                const localComments = JSON.parse(localStorage.getItem('timelineComments') || '[]');
-                localComments.forEach(comment => {
-                    const textElement = document.querySelector(`[data-text-id="${comment.textId}"]`);
-                    if (textElement) {
-                        currentTimelineItem = textElement.closest('.timeline-item');
-                        displayComment(comment);
-                    }
-                });
+async function loadComments() {
+    try {
+        console.log('正在从云端加载评论...');
+        const response = await fetch(JSONBIN_API_URL, {
+            headers: {
+                'X-Master-Key': JSONBIN_MASTER_KEY
             }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP错误: ${response.status}`);
         }
+        
+        const data = await response.json();
+        console.log('从云端收到的原始数据:', data);
+        console.log('data.record类型:', typeof data.record);
+        console.log('data.record内容:', data.record);
+        
+        // 处理数据格式
+        let comments = [];
+        if (Array.isArray(data.record)) {
+            comments = data.record;
+            console.log('数据是数组格式');
+        } else if (data.record && data.record.comments && Array.isArray(data.record.comments)) {
+            comments = data.record.comments;
+            console.log('数据是{comments: [...]}格式');
+        } else {
+            comments = data.record || [];
+            console.log('数据是其他格式');
+        }
+        
+        console.log('处理后的评论数组:', comments);
+        console.log('评论数量:', comments.length);
+        
+        // 过滤掉系统消息并渲染
+        const filteredComments = comments.filter(comment => {
+            console.log('检查评论:', comment);
+            const isNotSystem = comment.author !== 'system';
+            console.log('是否非系统消息:', isNotSystem);
+            return isNotSystem;
+        });
+        
+        console.log('过滤后的评论:', filteredComments);
+        
+        filteredComments.forEach((comment, index) => {
+            console.log(`处理第${index + 1}条评论:`, comment);
+            const textElement = document.querySelector(`[data-text-id="${comment.textId}"]`);
+            console.log(`查找textId=${comment.textId}的元素:`, textElement);
+            
+            if (textElement) {
+                currentTimelineItem = textElement.closest('.timeline-item');
+                displayComment(comment);
+                console.log('成功显示评论');
+            } else {
+                console.log('未找到对应的文字元素');
+            }
+        });
+        
+        // 本地备份
+        localStorage.setItem('timelineComments_backup', JSON.stringify(filteredComments));
+        console.log(`成功加载 ${filteredComments.length} 条评论`);
+        
+    } catch (error) {
+        console.error('从云端加载评论失败:', error);
+        // 降级到本地存储
+        const localComments = JSON.parse(localStorage.getItem('timelineComments') || '[]');
+        localComments.forEach(comment => {
+            const textElement = document.querySelector(`[data-text-id="${comment.textId}"]`);
+            if (textElement) {
+                currentTimelineItem = textElement.closest('.timeline-item');
+                displayComment(comment);
+            }
+        });
+    }
+}
     </script>
 </body>
 </html>
