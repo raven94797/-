@@ -686,6 +686,190 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
         }
+        /* 新增：编辑器CSS样式 */
+        .timeline-editor {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            z-index: 9999;
+        }
+
+        .editor-toggle {
+            background: var(--accent-color);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(255, 154, 139, 0.5);
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            outline: none;
+        }
+
+        .editor-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 154, 139, 0.7);
+            background: #ff7a6b;
+        }
+
+        .editor-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            margin-top: 15px;
+            display: none;
+            animation: slideUp 0.3s ease;
+            border: 2px solid rgba(255, 154, 139, 0.2);
+            max-height: 60vh;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .editor-panel.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .editor-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .editor-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .editor-form input,
+        .editor-form textarea,
+        .editor-form select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .editor-form input:focus,
+        .editor-form textarea:focus,
+        .editor-form select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .editor-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #ff7a6b;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f1f3f4;
+            color: #5f6368;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #dadce0;
+        }
+
+        /* 删除按钮样式 */
+        .btn-delete {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: auto;
+        }
+
+        .btn-delete:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        /* 编辑按钮样式 */
+        .edit-item-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 154, 139, 0.2);
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover .edit-item-btn {
+            opacity: 1;
+        }
+
+        .edit-item-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .editor-panel {
+                width: calc(100vw - 40px);
+                right: 20px;
+                left: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -849,7 +1033,7 @@
                     </div>
                     <h3 class="timeline-title">700×0.08=56</h3>
                     <div class="timeline-text">
-                        <p>之后的进展就很飞速了，现在想想也有些美好的如梦似换。</p>
+                        <p>之后的进展就很飞速了，现在想想也有些美好的如梦似幻。</p>
                         
                         <div class="memory-item">
                             <div class="memory-icon">
@@ -982,6 +1166,30 @@
                 </div>
             </div>
         </div>
+        <!-- 新增：时间轴编辑面板 -->
+        <div class="timeline-editor" id="timelineEditor">
+            <div class="editor-toggle" onclick="toggleEditor()">
+                <i class="fas fa-plus-circle"></i>
+                <span>添加新节点</span>
+            </div>
+            <div class="editor-panel">
+                <h3>添加新的时间轴节点</h3>
+                <div class="editor-form">
+                    <div id="entriesContainer"></div>
+
+                    <div style="display:flex;gap:12px;margin-bottom:12px;">
+                        <button type="button" class="btn-secondary" onclick="addEntryRow()">添加条目</button>
+                        <span style="align-self:center;color:#718096;font-size:0.9rem">可连续添加多个条目，每个条目独立选择类型</span>
+                    </div>
+
+                    <div class="editor-buttons">
+                        <button class="btn-delete" onclick="deleteTimelineItem()" style="display: none;">删除</button>
+                        <button class="btn-secondary" onclick="cancelEdit()">取消</button>
+                        <button class="btn-primary" onclick="saveNewTimelineItem()">保存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- 页脚 -->
         <footer class="footer">
@@ -1026,15 +1234,22 @@
 
             // 2. 启动爱心雨背景效果
             startHeartRain();
-            
-            // 3. 初始化可评论文本点击事件
-            initCommentableText();
-            
-            // 4. 初始化评论表单事件
-            initCommentForm();
-            
-            // 5. 加载已有的评论
-            loadComments();
+
+            // 3-5. 先加载自定义时间轴节点，再初始化可评论文本并加载评论
+            loadCustomTimelineItems().then(() => {
+                initCommentableText();
+                initCommentForm();
+                loadComments();
+                // 确保编辑按钮在自定义节点渲染后添加
+                setTimeout(() => { addEditButtonsToExistingItems(); }, 500);
+            }).catch(err => {
+                console.error('加载自定义节点失败（首次）:', err);
+                // 回退到默认初始化顺序
+                initCommentableText();
+                initCommentForm();
+                loadComments();
+                setTimeout(() => { addEditButtonsToExistingItems(); }, 500);
+            });
         });
 
         // 爱心雨背景效果函数
@@ -1309,7 +1524,7 @@
                 timestamp: new Date().toLocaleString('zh-CN')
             };
             
-            // 保存到localStorage
+                // 保存到localStorage
             saveComment(comment);
             
             // 在页面上显示评论
@@ -1317,41 +1532,6 @@
             
             // 关闭弹窗
             closeCommentModal();
-        }
-
-                // 保存评论到 JSONBin
-        async function saveComment(comment) {
-            try {
-                // 先保存到本地
-                let comments = JSON.parse(localStorage.getItem('timelineComments') || '[]');
-                comments.push(comment);
-                localStorage.setItem('timelineComments', JSON.stringify(comments));
-                
-                // 同步到云端
-                const response = await fetch(JSONBIN_API_URL, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': JSONBIN_MASTER_KEY
-                    },
-                    body: JSON.stringify({ comments: comments })
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`保存失败: ${response.status}`);
-                }
-                
-                console.log('评论保存成功');
-                showStatus('评论已保存到云端！', true);
-                
-            } catch (error) {
-                console.error('保存到云端失败:', error);
-                showStatus('保存失败，请检查网络后重试', false);
-                // 从本地移除失败的评论
-                let comments = JSON.parse(localStorage.getItem('timelineComments') || '[]');
-                comments = comments.filter(c => c.id !== comment.id);
-                localStorage.setItem('timelineComments', JSON.stringify(comments));
-            }
         }
                 // 显示状态提示
         function showStatus(message, isSuccess = true) {
@@ -1540,6 +1720,328 @@ async function loadComments() {
                 displayComment(comment);
             }
         });
+    }
+}
+
+// ====== JSONBin 统一请求辅助函数（用于时间轴编辑） ======
+async function fetchJsonBin(options = {}) {
+    const defaultHeaders = {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JSONBIN_MASTER_KEY
+    };
+
+    try {
+        const method = (options && options.method) || 'GET';
+        if (window.debugLog) window.debugLog(`→ ${method} ${JSONBIN_API_URL}`);
+
+        const resp = await fetch(JSONBIN_API_URL, {
+            ...options,
+            headers: {
+                ...defaultHeaders,
+                ...options.headers
+            }
+        });
+
+        if (!resp.ok) {
+            try { const text = await resp.clone().text(); if (window.debugLog) window.debugLog(`✖ ${resp.status} ${text}`); } catch(e){}
+        } else {
+            if (window.debugLog) window.debugLog(`✓ ${resp.status} ${method}`);
+        }
+
+        return resp;
+    } catch (err) {
+        console.error('fetchJsonBin 网络或 CORS 错误:', err);
+        if (window.debugLog) window.debugLog(`⚠ ${err.message || err}`);
+        throw err;
+    }
+}
+
+// 保存完整记录到 JSONBin 的通用函数（用于更新 comments 或 timeline）
+async function saveFullRecord(record) {
+    const putResponse = await fetchJsonBin({ method: 'PUT', body: JSON.stringify(record) });
+    if (!putResponse.ok) throw new Error(`保存失败: ${putResponse.status}`);
+    return putResponse;
+}
+
+// 调试面板（如果需要可见）
+(function createDebugPanel(){
+    const btn = document.createElement('button');
+    btn.id = 'debugToggleBtn';
+    btn.textContent = '调试日志';
+    Object.assign(btn.style, { position: 'fixed', right: '20px', bottom: '20px', zIndex: 2000, padding: '8px 12px', borderRadius: '8px', background: 'rgba(0,0,0,0.7)', color: 'white', border: 'none', cursor: 'pointer' });
+    document.body.appendChild(btn);
+
+    const panel = document.createElement('div');
+    panel.id = 'debugLogPanel';
+    Object.assign(panel.style, { position: 'fixed', right: '20px', bottom: '64px', width: '420px', maxHeight: '50vh', overflow: 'auto', zIndex: 2000, background: 'rgba(0,0,0,0.85)', color: '#fff', padding: '10px', borderRadius: '8px', fontSize: '12px', display: 'none', whiteSpace: 'pre-wrap' });
+    document.body.appendChild(panel);
+
+    btn.addEventListener('click', () => { panel.style.display = panel.style.display === 'none' ? 'block' : 'none'; });
+
+    window.debugLog = function(msg) {
+        try {
+            const time = new Date().toLocaleTimeString();
+            const line = document.createElement('div');
+            line.textContent = `[${time}] ${msg}`;
+            panel.appendChild(line);
+            panel.scrollTop = panel.scrollHeight;
+            console.log('[DEBUG]', msg);
+        } catch (e) { console.log('debugLog error', e); }
+    };
+})();
+
+// ====== 时间轴编辑器 JS 实现 ======
+let isEditing = false;
+let editingItemId = null;
+
+function createEntryRow(item, isFirst) {
+    const row = document.createElement('div');
+    row.className = 'entry-row';
+    row.style.border = '1px solid #eee';
+    row.style.padding = '12px';
+    row.style.borderRadius = '8px';
+    row.style.marginBottom = '12px';
+
+    const dateVal = item?.date || '';
+    const titleVal = item?.title || '';
+    const contentVal = (item?.content && !item.blocks) ? item.content.replace(/<[^>]*>/g, '') : (item?.blocks?.[0]?.content || item?.content || '');
+    const typesVal = Array.isArray(item?.types) ? item.types : (item?.type ? [item.type] : (item?.blocks?.[0]?.types || ['normal']));
+
+    let html = '';
+    if (isFirst) {
+        html += `\n        <div class="form-group">\n            <label>日期：</label>\n            <input type="text" class="entry-date" placeholder="例如：2026年3月" value="${escapeHtml(dateVal)}">\n        </div>\n        <div class="form-group">\n            <label>标题：</label>\n            <input type="text" class="entry-title" placeholder="事件标题" value="${escapeHtml(titleVal)}">\n        </div>\n        `;
+    }
+
+    html += `\n        <div class="form-group">\n            <label>内容：</label>\n            <textarea class="entry-content" placeholder="详细描述..." rows="3">${escapeHtml(contentVal)}</textarea>\n        </div>\n        <div class="form-group">\n            <label>类型：</label>\n            <select class="entry-type-select">\n                <option value="memory">记忆片段</option>\n                <option value="chat">对话记录</option>\n                <option value="highlight">重点内容</option>\n                <option value="normal">普通叙述</option>\n            </select>\n        </div>\n        <div style="display:flex;gap:8px;justify-content:flex-end;">\n            <button type="button" class="btn-secondary" onclick="removeEntryRow(this)">移除</button>\n        </div>\n    `;
+
+    row.innerHTML = html;
+
+    const typeSelect = row.querySelector('.entry-type-select');
+    if (typeSelect) {
+        const allowedTypes = ['memory','chat','highlight','normal'];
+        const candidate = (Array.isArray(typesVal) && typesVal.length>0) ? typesVal[0] : (typesVal || 'normal');
+        const pick = allowedTypes.includes(candidate) ? candidate : 'normal';
+        typeSelect.value = pick;
+    }
+
+    const sideName = 'entry-side-' + Math.floor(Math.random() * 1000000);
+    const sideWrap = document.createElement('div');
+    sideWrap.style.display = 'flex';
+    sideWrap.style.gap = '8px';
+    sideWrap.style.alignItems = 'center';
+    sideWrap.style.marginTop = '8px';
+    sideWrap.innerHTML = `\n        <label style="font-weight:600; margin-right:6px;">对话方向：</label>\n        <label><input type="radio" name="${sideName}" value="left" class="entry-side" checked> 左侧</label>\n        <label><input type="radio" name="${sideName}" value="right" class="entry-side"> 右侧</label>\n    `;
+    row.appendChild(sideWrap);
+
+    const updateSideState = () => {
+        let hasChat = false;
+        if (typeSelect) hasChat = (typeSelect.value === 'chat');
+        const radios = row.querySelectorAll('.entry-side');
+        radios.forEach(r => r.disabled = !hasChat);
+        if (!hasChat) {
+            const left = row.querySelector(`input[name="${sideName}"][value="left"]`);
+            if (left) left.checked = true;
+        }
+    };
+
+    if (typeSelect) typeSelect.addEventListener('change', updateSideState);
+    setTimeout(updateSideState, 0);
+
+    return row;
+}
+
+function addEntryRow(item, isFirstParam) {
+    const container = document.getElementById('entriesContainer');
+    if (!container) return;
+    const isFirst = (typeof isFirstParam === 'boolean') ? isFirstParam : (container.children.length === 0);
+    const row = createEntryRow(item, isFirst);
+    container.appendChild(row);
+}
+
+function removeEntryRow(btn) { const row = btn.closest('.entry-row'); if (row) row.remove(); }
+
+function escapeHtml(str) { if (!str) return ''; return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+function toggleEditor() {
+    const panel = document.querySelector('.editor-panel');
+    const toggleBtn = document.querySelector('.editor-toggle');
+    if (panel.classList.contains('active')) {
+        panel.classList.remove('active');
+        toggleBtn.innerHTML = '<i class="fas fa-plus-circle"></i><span>添加新节点</span>';
+    } else {
+        panel.classList.add('active');
+        toggleBtn.innerHTML = '<i class="fas fa-times"></i><span>关闭编辑器</span>';
+        resetEditForm();
+    }
+}
+
+function resetEditForm() {
+    const container = document.getElementById('entriesContainer');
+    if (container) { container.innerHTML = ''; addEntryRow(); }
+    isEditing = false; editingItemId = null;
+    const saveBtn = document.querySelector('.btn-primary'); if (saveBtn) saveBtn.textContent = '保存';
+    const deleteBtn = document.querySelector('.btn-delete'); if (deleteBtn) deleteBtn.style.display = 'none';
+}
+
+function cancelEdit() { toggleEditor(); }
+
+function editTimelineItem(itemId) {
+    const item = document.querySelector(`[data-item-id="${itemId}"]`);
+    if (!item) return;
+    const date = item.querySelector('.timeline-date').textContent.trim().replace('\n','').replace(/\s+/g,' ');
+    const title = item.querySelector('.timeline-title').textContent;
+    const content = item.querySelector('.timeline-text').innerHTML;
+    let blocks = [];
+    try { if (item.dataset.blocks) blocks = JSON.parse(item.dataset.blocks); } catch(e) { blocks = []; }
+    if (blocks.length === 0) {
+        const inferred = []; const chat = item.querySelectorAll('.chat-bubble'); chat.forEach(cb => inferred.push({ content: cb.textContent.trim(), types: ['chat'] }));
+        const memories = item.querySelectorAll('.memory-item'); memories.forEach(m => inferred.push({ content: m.textContent.trim(), types: ['memory'] }));
+        const highlights = item.querySelectorAll('.highlight-box'); highlights.forEach(h => inferred.push({ content: h.textContent.trim(), types: ['highlight'] }));
+        if (inferred.length > 0) blocks = inferred;
+    }
+    const container = document.getElementById('entriesContainer');
+    if (container) {
+        container.innerHTML = '';
+        addEntryRow({ date: date.replace('\u{f073}','').trim(), title: title, content: blocks[0]?.content || content, types: blocks[0]?.types || undefined }, true);
+        for (let i=1;i<blocks.length;i++) addEntryRow({ content: blocks[i].content, types: blocks[i].types }, false);
+    }
+    isEditing = true; editingItemId = itemId;
+    const saveBtn = document.querySelector('.btn-primary'); if (saveBtn) saveBtn.textContent = '更新';
+    const deleteBtn = document.querySelector('.btn-delete'); if (deleteBtn) deleteBtn.style.display = 'inline-block';
+    const panel = document.querySelector('.editor-panel'); if (!panel.classList.contains('active')) toggleEditor();
+}
+
+async function deleteTimelineItem() {
+    if (!editingItemId || !confirm('确定要删除这个时间轴节点吗？此操作不可撤销。')) return;
+    try {
+        const item = document.querySelector(`[data-item-id="${editingItemId}"]`);
+        if (item) { item.style.opacity='0'; item.style.transform='translateY(-20px)'; setTimeout(()=>item.remove(),300); }
+        const response = await fetchJsonBin();
+        let existingData = { timeline: [] };
+        if (response.ok) { const data = await response.json(); existingData = data.record || { timeline: [] }; }
+        existingData.timeline = existingData.timeline.filter(it => `item-${it.id}` !== editingItemId);
+        await saveFullRecord(existingData);
+        showStatus('时间轴节点已删除！', true);
+        cancelEdit();
+    } catch (error) { console.error('删除失败:', error); showStatus('删除失败，请检查网络连接', false); }
+}
+
+async function saveNewTimelineItem() {
+    const rows = Array.from(document.querySelectorAll('.entry-row'));
+    if (rows.length === 0) { alert('请至少添加一个条目'); return; }
+    const entries = rows.map(r => {
+        const date = (r.querySelector('.entry-date')?.value || '').trim();
+        const title = (r.querySelector('.entry-title')?.value || '').trim();
+        const content = (r.querySelector('.entry-content')?.value || '').trim();
+        const type = (r.querySelector('.entry-type-select')?.value) || 'normal';
+        const types = [type];
+        const sideInput = r.querySelector('.entry-side:checked');
+        const side = sideInput ? sideInput.value : 'left';
+        return { date, title, content, types, type, side };
+    });
+    for (let i=0;i<entries.length;i++) {
+        const e = entries[i];
+        if (i===0) { if (!e.title || !e.content) { alert('首条必须包含标题和内容'); return; } }
+        else { if (!e.content) { alert('后续条目必须填写内容或移除空条目'); return; } }
+    }
+    try {
+        const response = await fetchJsonBin();
+        let existingData = { timeline: [] };
+        if (response.ok) { const data = await response.json(); existingData = data.record || { timeline: [] }; }
+        if (!existingData.timeline) existingData.timeline = [];
+        if (isEditing && editingItemId) {
+            const itemIndex = existingData.timeline.findIndex(item => `item-${item.id}` === editingItemId);
+            if (itemIndex !== -1) {
+                const first = entries[0];
+                const blocks = entries.map(e => ({ content: e.content, types: e.types, side: e.side || 'left' }));
+                existingData.timeline[itemIndex] = { ...existingData.timeline[itemIndex], date: first.date, title: first.title, blocks: blocks, types: blocks[0].types, type: blocks[0].types[0], timestamp: new Date().toISOString() };
+                updateTimelineItem(existingData.timeline[itemIndex]);
+                showStatus('时间轴节点已更新！', true);
+            }
+        } else {
+            const first = entries[0];
+            const blocks = entries.map(e => ({ content: e.content, types: e.types, side: e.side || 'left' }));
+            const newItem = { id: Date.now(), date: first.date, title: first.title, blocks: blocks, types: blocks[0].types, type: blocks[0].types[0], timestamp: new Date().toISOString() };
+            existingData.timeline.push(newItem);
+            renderNewTimelineItem(newItem);
+            showStatus('新节点已添加并保存到云端！', true);
+        }
+        await saveFullRecord(existingData);
+        cancelEdit();
+    } catch (error) { console.error('保存失败:', error); showStatus('保存失败，请检查网络连接', false); }
+}
+
+function renderNewTimelineItem(item) {
+    const timeline = document.querySelector('.timeline');
+    const newItemElement = createTimelineItemElement(item);
+    const editBtn = document.createElement('button'); editBtn.className='edit-item-btn'; editBtn.innerHTML='<i class="fas fa-edit"></i>'; editBtn.onclick = () => editTimelineItem(`item-${item.id}`);
+    const timelineContent = newItemElement.querySelector('.timeline-content'); timelineContent.style.position='relative'; timelineContent.appendChild(editBtn);
+    timeline.appendChild(newItemElement);
+    setTimeout(()=>{ newItemElement.style.opacity='1'; newItemElement.style.transform='translateY(0)'; },100);
+}
+
+function updateTimelineItem(item) {
+    const existingItem = document.querySelector(`[data-item-id="item-${item.id}"]`);
+    if (existingItem) {
+        const newItemElement = createTimelineItemElement(item);
+        existingItem.parentNode.replaceChild(newItemElement, existingItem);
+        const editBtn = document.createElement('button'); editBtn.className='edit-item-btn'; editBtn.innerHTML='<i class="fas fa-edit"></i>'; editBtn.onclick = () => editTimelineItem(`item-${item.id}`);
+        const timelineContent = newItemElement.querySelector('.timeline-content'); timelineContent.style.position='relative'; timelineContent.appendChild(editBtn);
+    }
+}
+
+function createTimelineItemElement(item) {
+    const newItemElement = document.createElement('div'); newItemElement.className='timeline-item'; newItemElement.style.animationDelay='0.1s'; newItemElement.dataset.itemId = `item-${item.id}`;
+    const blocks = Array.isArray(item.blocks) ? item.blocks : ((item.content || item.types) ? [{ content: item.content || '', types: item.types || (item.type ? [item.type] : ['normal']) }] : [{ content: '', types: ['normal'] }]);
+    const allowedTypes = ['memory','chat','highlight'];
+    const blocksHtml = blocks.map(b => { const rawTypes = Array.isArray(b.types) ? b.types : (b.type ? [b.type] : []); const types = rawTypes.filter(t => allowedTypes.includes(t)); const sideClass = (b.side === 'right') ? 'chat-right' : 'chat-left'; if (types.includes('chat')) { return `<div class="chat-bubble ${sideClass}">${b.content}</div>`; } else if (types.includes('memory')) { return `<div class="memory-item"><div class="memory-icon"><i class="fas fa-star"></i></div><div><strong>${item.title}</strong><br>${b.content}</div></div>`; } else if (types.includes('highlight')) { return `<div class="highlight-box">${b.content}</div>`; } else { return `<p>${b.content}</p>`; } }).join('\n');
+    newItemElement.innerHTML = `\n        <div class="timeline-dot"></div>\n        <div class="timeline-content">\n            <div class="timeline-date">\n                <i class="fas fa-calendar-alt"></i>\n                ${item.date}\n            </div>\n            <h3 class="timeline-title">${item.title}</h3>\n            \n            <div class="timeline-text">\n                ${blocksHtml}\n            </div>\n        </div>\n    `;
+    try { newItemElement.dataset.types = JSON.stringify(blocks[0]?.types || item.types || item.type || []); } catch(e) {}
+    try { if (item.blocks) newItemElement.dataset.blocks = JSON.stringify(item.blocks); } catch(e) {}
+    return newItemElement;
+}
+
+function addEditButtonsToExistingItems() {
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    timelineItems.forEach(item => {
+        const itemId = item.dataset.itemId;
+        if (itemId && !item.querySelector('.edit-item-btn')) {
+            const editBtn = document.createElement('button'); editBtn.className='edit-item-btn'; editBtn.innerHTML='<i class="fas fa-edit"></i>'; editBtn.onclick = () => editTimelineItem(itemId);
+            const timelineContent = item.querySelector('.timeline-content'); timelineContent.style.position='relative'; timelineContent.appendChild(editBtn);
+        }
+    });
+}
+
+async function loadCustomTimelineItems() {
+    try {
+        const response = await fetchJsonBin();
+        if (response.ok) {
+            const data = await response.json();
+            let customItems = data.record?.timeline || [];
+            customItems = customItems.map(it => { if (it && !Array.isArray(it.types) && it.type) return { ...it, types: [it.type] }; return it; });
+            customItems.forEach(item => renderNewTimelineItem(item));
+        }
+    } catch (error) { console.log('加载自定义时间轴节点失败:', error); }
+}
+
+// 更新 saveComment：先 GET 完整记录，合并 comments 后 PUT，避免覆盖 timeline
+async function saveComment(comment) {
+    try {
+        let comments = JSON.parse(localStorage.getItem('timelineComments') || '[]');
+        comments.push(comment);
+        localStorage.setItem('timelineComments', JSON.stringify(comments));
+
+        const getResponse = await fetchJsonBin();
+        let existingData = { comments: [], timeline: [] };
+        if (getResponse.ok) { const data = await getResponse.json(); existingData = data.record || existingData; }
+        existingData.comments = comments;
+        const putResp = await saveFullRecord(existingData);
+        if (!putResp.ok) throw new Error(`保存失败: ${putResp.status}`);
+        console.log('评论保存成功'); showStatus('评论已保存到云端！', true);
+    } catch (error) {
+        console.error('保存到云端失败:', error);
+        showStatus('保存失败，请检查网络后重试', false);
+        let comments = JSON.parse(localStorage.getItem('timelineComments') || '[]'); comments = comments.filter(c => c.id !== comment.id); localStorage.setItem('timelineComments', JSON.stringify(comments));
     }
 }
     </script>
